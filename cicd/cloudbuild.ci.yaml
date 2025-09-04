@@ -1,0 +1,36 @@
+# Replace Content in <arrows> with app-specific info.
+
+# This is the BUILD pipeline in the CI/CD process
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  # Build the Docker image with both SHORT_SHA and latest tags
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-and-tag-image'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:${SHORT_SHA}'
+      - '-t'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:latest'
+      - '.'
+
+  # Push the SHORT_SHA tagged image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-sha-image'
+    args:
+      - 'push'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:${SHORT_SHA}'
+
+  # Push the latest tag
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-latest-image'
+    args:
+      - 'push'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:latest'
+
+images:
+  - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:${SHORT_SHA}'
+  - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:latest'
