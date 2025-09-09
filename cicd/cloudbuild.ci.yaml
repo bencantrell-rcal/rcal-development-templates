@@ -1,20 +1,23 @@
-# Replace Content in <arrows> with app-specific info.
-
-# This is the BUILD pipeline in the CI/CD process
+#This is the BUILD pipeline in the CI/CD process
 
 options:
   logging: CLOUD_LOGGING_ONLY
 
+substitutions:
+  _SANITIZED_BRANCH: '${BRANCH_NAME//\//-}'
+
 steps:
-  # Build the Docker image with both SHORT_SHA and latest tags
+  # Build the Docker image with SHORT_SHA, latest, and branch name tags
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-and-tag-image'
     args:
       - 'build'
       - '-t'
-      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:${SHORT_SHA}'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:${SHORT_SHA}'
       - '-t'
-      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:latest'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:latest'
+      - '-t'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:${_SANITIZED_BRANCH}'
       - '.'
 
   # Push the SHORT_SHA tagged image
@@ -22,15 +25,23 @@ steps:
     id: 'push-sha-image'
     args:
       - 'push'
-      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:${SHORT_SHA}'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:${SHORT_SHA}'
 
   # Push the latest tag
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-latest-image'
     args:
       - 'push'
-      - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:latest'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:latest'
+
+  # Push the branch name tag
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-branch-image'
+    args:
+      - 'push'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:${_SANITIZED_BRANCH}'
 
 images:
-  - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:${SHORT_SHA}'
-  - 'us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME>:latest'
+  - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:${SHORT_SHA}'
+  - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:latest'
+  - 'us-south1-docker.pkg.dev/$PROJECT_ID/rats-backend/rats-backend:${_SANITIZED_BRANCH}'
