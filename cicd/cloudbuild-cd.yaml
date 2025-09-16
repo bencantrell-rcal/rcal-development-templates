@@ -1,5 +1,3 @@
-# Replace Content in <arrows> with app-specific info.
-
 # This is the RELEASE pipeline in the CI/CD process
 
 options:
@@ -9,7 +7,6 @@ options:
 substitutions:
   _ENV: 'test'                # Can be overridden in Cloud Build UI
   _IMAGE_TAG: 'latest'        # Can be overridden in Cloud Build UI
-  _IP_ADDRESS: 'rats-backend-test-ip'   # Can be overridden in Cloud Build UI
 
 steps:
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -44,7 +41,7 @@ steps:
           --set image.repository=us-south1-docker.pkg.dev/$PROJECT_ID/<APP NAME>/<APP NAME> \
           --set image.tag=${_IMAGE_TAG} \
           --set image.pullPolicy=Always \
-          --set ingress.loadBalancerIP="${_IP_ADDRESS}" \
+          --set ingress.path="/api/<SHORTENED APP NAME>" \
           --set redeployTimestamp="$(date +%s)" \
           --namespace "$namespace" \
           --create-namespace \
