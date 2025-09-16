@@ -20,7 +20,6 @@ service:
 
 ingress:
   enabled: true
-  loadBalancerIP: <APP NAME>-backend-test-ip
   paths:
     - path: /api/<APP NAME>/(.*)
       serviceName: <APP NAME>-test-service
