@@ -1,8 +1,17 @@
 image:
   tag: test-latest
+
 replicas: 1
 containerPort: 8080
 
 service:
   type: ClusterIP
   port: 80
+
+ingress:
+  enabled: true
+  loadBalancerIP: <APP NAME>-backend-test-ip
+  paths:
+    - path: /api/<SHORTENED APP NAME>/(.*)
+      serviceName: <APP NAME>-test-service
+      servicePort: 80
